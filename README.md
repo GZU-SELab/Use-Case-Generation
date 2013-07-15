@@ -1,1 +1,1 @@
-More details at wiki page
+More details at wiki page.
