@@ -1,4 +1,1 @@
-Use-Case-Generation
-===================
-
-Use Case Generation from Z notation
+More details at wiki page
