@@ -7,7 +7,7 @@ type		Int
 string		[a-zA-Z_][0-9a-zA-Z_-]*
 variable	[a-zA-Z_][0-9a-zA-Z_-]*[?!]
 number		[0-9]+ 
-predicate   ">"|">="|"<"|"<="|"=="|"!="
+predicate   ">"|">="|"<"|"<="|"="|"!="
 connector   "&&"|"||"
 opt 		"+"|"-"|"*"|"/"
 others		";"|":"|","|"("|")"
@@ -20,6 +20,14 @@ others		";"|":"|","|"("|")"
 {predicate}						  {
 										switch(yytext[0])
 										{
+											case '=':
+													printf("read =\n");
+												    return E;
+												break;	
+											case '!':
+													printf("read !=\n");
+												    return NE;
+												break;	
 											case '>':
 											    if (yyleng > 1)
 												{
@@ -43,22 +51,18 @@ others		";"|":"|","|"("|")"
 													printf("read <\n");
 												    return L;
 												}
-												break;	
-											case '=':
-												    return E;
-												break;	
-											case '!':
-												    return NE;
-												break;													
+												break;																								
 										}
 								  }
 {connector}						  {
 										switch(yytext[0])
 										{
 											case '&':
+												printf("read AND\n");
 												return AND;
 												break;
 											case '|':
+												printf("read OR\n");
 												return OR;
 												break;									
 										}
