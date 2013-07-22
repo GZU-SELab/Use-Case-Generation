@@ -6,17 +6,17 @@
 type		Int
 string		[a-zA-Z_][0-9a-zA-Z_-]*
 variable	[a-zA-Z_][0-9a-zA-Z_-]*[?!]
-number		[0-9]+ 
+number		\-?[0-9]+ 
 predicate   ">"|">="|"<"|"<="|"="|"!="
 connector   "&&"|"||"
 opt 		"+"|"-"|"*"|"/"
 others		";"|":"|","|"("|")"
 %%
 
-{type}            				  {printf("read type: %s\n", yytext); yylval = strdup(yytext); return TYPE;}
-{string}           				  {printf("read string: %s\n", yytext); yylval = strdup(yytext); return STRING;}
-{variable}     				      {printf("read variable: %s\n", yytext);yylval = strdup(yytext); return VARIABLE;}
-{number}    				      {printf("read number: %s\n", yytext);yylval = strdup(yytext); return NUMBER;}
+{type}            				  {printf("read type: %s\n", yytext); strcpy(yylval.string, yytext); return TYPE;}
+{string}           				  {printf("read string: %s\n", yytext); strcpy(yylval.string, yytext); return STRING;}
+{variable}     				      {printf("read variable: %s\n", yytext);strcpy(yylval.string, yytext); return VARIABLE;}
+{number}    				      {printf("read number: %s\n", yytext);strcpy(yylval.string, yytext); return NUMBER;}
 {predicate}						  {
 										switch(yytext[0])
 										{
