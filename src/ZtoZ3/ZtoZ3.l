@@ -1,6 +1,8 @@
 %{
 #include <stdio.h>
 #include "y.tab.h"
+extern int linenumber;
+int linenumber = 1;
 %}
 
 type		Int
@@ -11,6 +13,7 @@ predicate   ">"|">="|"<"|"<="|"="|"!="
 connector   "&&"|"||"
 opt 		"+"|"-"|"*"|"/"
 others		";"|":"|","|"("|")"
+line		"\n"|"\r\n"
 %%
 
 {type}            				  {printf("read type: %s\n", yytext); strcpy(yylval.string, yytext); return TYPE;}
@@ -110,7 +113,9 @@ others		";"|":"|","|"("|")"
 										}
 								  }
 								  
-							
-[ \t\r\n]+        				  {ECHO; /* ignore blank */}
+
+{line}							  {linenumber++;}
+[ \t\r]+        				  {ECHO; /* ignore blank */}
+
 
 %%

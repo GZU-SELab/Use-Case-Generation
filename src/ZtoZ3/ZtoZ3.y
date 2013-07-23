@@ -34,12 +34,14 @@ schema	:  schemaname SEMICOLON declaration SEMICOLON formula SEMICOLON
 						fprintf(yyout, "(assert %s)\n", $5);
 						fprintf(yyout, "(apply (then simplify (repeat (or-else split-clause skip)))) \n");
 						printf("accept\n");
+						linenumber = 0;
 				  }
         |  schema schemaname SEMICOLON declaration SEMICOLON formula SEMICOLON 
 		          {
 						fprintf(yyout, "(assert %s)\n", $6);
 						fprintf(yyout, "(apply (then simplify (repeat (or-else split-clause skip)))) \n");
 						printf("accept\n");
+						linenumber = 0;
 				  }
 	    ;
 		
@@ -161,7 +163,7 @@ int yywrap()
 
 int yyerror(char *str)  
 {  
-    fprintf(stderr,"Error: %s\n",str);  
+    fprintf(stderr,"Error: %s, Token: %s, at line: %d\n", str, yytext, linenumber);  
     return 1;        
 }
 
