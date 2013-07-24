@@ -1,0 +1,17 @@
+(declare-const a Int)
+(declare-const b Int)
+(declare-const sum Int)
+
+
+(assert (or (and (<= a 80) (<= 0 a) (<= b 80) (<= 0 b) (<= (+ a b) 100)
+         (= (+ a b) sum)) 
+         (and (or (< a 0) (> a 80) (< b 0) (> b 80) (and (<= a 80) (<= 0 a) (<= b 80) (<= 0 b) (> (+ a b) 100))) (= sum -1))
+         ))
+
+(echo "---------CNF----------")
+(apply (then (! simplify :elim-and true) elim-term-ite tseitin-cnf))
+(echo "---------DNF----------")
+(apply (then simplify (repeat (or-else split-clause skip))))
+
+0 <= a? && a? <= 80 && 0 <= a? && a? <=80 && a? + b? <= 100 && sum! = a? + b? || 
+a? < 0 || a? > 80 || b? < 0 || b? > 80 || 0 <= a? && a? <= 80 && a? + b? > 100 && sum != -1;

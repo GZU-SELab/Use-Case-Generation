@@ -1,0 +1,159 @@
+Any Formula -> CNF 		http://rise4fun.com/Z3/TEu6
+(declare-const x Int)
+(declare-const y Int)
+(declare-const z Int)
+
+(assert (or (and (> x 0) (> y 0)) (> z 0)))
+
+(apply (then (! simplify :elim-and true) elim-term-ite tseitin-cnf))
+
+(goals
+(goal
+  (or (not (<= x 0)) (not (<= z 0)))
+  (or (not (<= y 0)) (not (<= z 0)))
+  :precision precise :depth 3)
+)
+
+
+CNF -> DNF 				http://rise4fun.com/Z3/zMjO
+(declare-const t1 Int)
+(declare-const t2 Int)
+(declare-const t3 Int)
+
+(assert (and (or (>= t1 2) (>= t2 3))
+             (>= t3 1)
+             (or (<= t1 4) (<= t2 5))))
+
+(apply (then simplify (repeat (or-else split-clause skip))))
+
+(goals
+(goal
+  (>= t1 2)
+  (>= t3 1)
+  (<= t1 4)
+  :precision precise :depth 3)
+(goal
+  (>= t1 2)
+  (>= t3 1)
+  (<= t2 5)
+  :precision precise :depth 3)
+(goal
+  (>= t2 3)
+  (>= t3 1)
+  (<= t1 4)
+  :precision precise :depth 3)
+(goal
+  (>= t2 3)
+  (>= t3 1)
+  (<= t2 5)
+  :precision precise :depth 3)
+)
+
+
+(declare-const x Int)
+(declare-const y Int)
+(declare-const z Int)
+(declare-const d Int)
+
+(assert (and (or (and (> x 0) (> y 0)) (> z 0)) (> d 0)))
+
+(echo "---------CNF----------")
+(apply (then (! simplify :elim-and true) elim-term-ite tseitin-cnf))
+(echo "---------DNF----------")
+(apply (then simplify (repeat (or-else split-clause skip))))
+
+---------CNF----------
+(goals
+(goal
+  (or (not (<= x 0)) (not (<= z 0)))
+  (or (not (<= y 0)) (not (<= z 0)))
+  (not (<= d 0))
+  :precision precise :depth 3)
+)
+---------DNF----------
+(goals
+(goal
+  (not (<= x 0))
+  (not (<= d 0))
+  (not (<= y 0))
+  :precision precise :depth 2)
+(goal
+  (not (<= z 0))
+  (not (<= d 0))
+  :precision precise :depth 2)
+)
+
+
+
+
+
+
+
+-------------------------
+
+(declare-const a Int)
+(declare-const b Int)
+(declare-const sum Int)
+
+
+(assert (or (and (<= a 80) (<= 0 a) (<= b 80) (<= 0 b) (<= (+ a b) 100)
+         (= (+ a b) sum)) 
+         (and (or (< a 0) (> a 80) (< b 0) (> b 80) (and (<= a 80) (<= 0 a) (<= b 80) (<= 0 b) (> (+ a b) 100))) (= sum -1))
+         ))
+
+(echo "---------CNF----------")
+(apply (then (! simplify :elim-and true) elim-term-ite tseitin-cnf))
+(echo "---------DNF----------")
+(apply (then simplify (repeat (or-else split-clause skip))))
+
+
+---------DNF----------
+(goals
+(goal
+  (<= a 80)
+  (<= 0 a)
+  (<= b 80)
+  (<= 0 b)
+  (<= (+ a b) 100)
+  (= (+ a b) sum)
+  :precision precise :depth 2)
+(goal
+  (not (<= 0 a))
+  (= sum (- 1))
+  :precision precise :depth 3)
+(goal
+  (not (<= a 80))
+  (= sum (- 1))
+  :precision precise :depth 3)
+(goal
+  (not (<= 0 b))
+  (= sum (- 1))
+  :precision precise :depth 3)
+(goal
+  (not (<= b 80))
+  (= sum (- 1))
+  :precision precise :depth 3)
+(goal
+  (<= a 80)
+  (= sum (- 1))
+  (<= 0 a)
+  (<= b 80)
+  (<= 0 b)
+  (not (<= (+ a b) 100))
+  :precision precise :depth 3)
+)
+
+项目目标：
+将Z语言描述的用例（方法）的需求（一阶逻辑公式，包含输入、运算、输出）转化DNF范式，然后从DNF范式生成为N个测试用例，达到M%覆盖率
+
+目前的尝试：（详细见附件）
+1. 一个朱浩写的小例子，使用Z语言描述一个用例的需求，然后转化为DNF范式
+2.使用Z3,就是我论文里使用的那个SMT工具，将这个例子中的一阶逻辑公式用标准SMT描述(LISP语言风格)后转化为DNF范式，其中每个goal就是一个合取式(每行)，goal之间是析取关系。
+
+测试用例自动生成项目计划
+1. 规定书写到程序中的Z*语言。
+2. 编写编译器，实现Z*语言到Z3的转换
+3. 使用程序调用Z3,将需求转化为DNF范式
+4. 使用正则表达式读取Z3结果到程序中，考虑覆盖率或者用例数的情况下，对每个合取式（每种情况）生成测试用例。
+（需要查询文章，看看其他算法，看是否可以创新，但可先实现简单算法，如平均等权重覆盖）
+5. 集成到一个程序中
